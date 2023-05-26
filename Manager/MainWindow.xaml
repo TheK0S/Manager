@@ -15,8 +15,34 @@
         </Style>
         <Style TargetType="Button">
             <Setter Property="Width" Value="110"/>
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Margin" Value="20"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Margin" Value="20 5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     <Grid>
@@ -25,21 +51,22 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="0.1*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="0.3*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Категории" Style="{StaticResource header}"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text="Слова" Style="{StaticResource header}"/>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBlock Text="Поиск:" DockPanel.Dock="Left" VerticalAlignment="Center" Margin="10"/>
             <TextBox x:Name="categorySearchField" Height="25" Width="400" Margin="10"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBlock Text="Категория:" VerticalAlignment="Center" Margin="10"/>
             <ComboBox x:Name="wordCategory" Height="25" Width="200" Margin="10"/>
             <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="50 10 10 10"/>
@@ -62,25 +89,25 @@
 
         <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="addCategory">
-                <TextBlock TextWrapping="Wrap" Text="Добавить категорию" Margin="1" TextAlignment="Center"/>
+                <TextBlock TextWrapping="Wrap" Text="Добавить категорию" Margin="2" TextAlignment="Center"/>
             </Button>
             <Button x:Name="updateCategory">
-                <TextBlock TextWrapping="Wrap" Text="Редактировать категорию" Margin="1" TextAlignment="Center"/>
+                <TextBlock TextWrapping="Wrap" Text="Редактировать категорию" Margin="2" TextAlignment="Center"/>
             </Button>
             <Button x:Name="removeCategory">
-                <TextBlock TextWrapping="Wrap" Text="Удалить категорию" Margin="1" TextAlignment="Center"/>
+                <TextBlock TextWrapping="Wrap" Text="Удалить категорию" Margin="2" TextAlignment="Center"/>
             </Button>
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="addWord">
-                <TextBlock TextWrapping="Wrap" Text="Добавить слово" Margin="1" TextAlignment="Center"/>
+                <TextBlock TextWrapping="Wrap" Text="Добавить слово" Margin="2" TextAlignment="Center"/>
             </Button>
             <Button x:Name="updateWord">
-                <TextBlock TextWrapping="Wrap" Text="Редактировать слово" Margin="1" TextAlignment="Center"/>
+                <TextBlock TextWrapping="Wrap" Text="Редактировать слово" Margin="2" TextAlignment="Center"/>
             </Button>
             <Button x:Name="removeWord">
-                <TextBlock TextWrapping="Wrap" Text="Удалить слово" Margin="1" TextAlignment="Center"/>
+                <TextBlock TextWrapping="Wrap" Text="Удалить слово" Margin="2" TextAlignment="Center"/>
             </Button>
         </StackPanel>
     </Grid>
