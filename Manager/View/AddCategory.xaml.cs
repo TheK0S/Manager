@@ -13,17 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Manager
+namespace Manager.View
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Логика взаимодействия для AddCategory.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class AddCategory : Page
     {
-        public MainWindow()
+        public AddCategory()
         {
             InitializeComponent();
-            mainFrame.Navigate(new DataPage());
+        }
+
+        private void back_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
         }
     }
 }

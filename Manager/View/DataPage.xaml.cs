@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Manager.View;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +17,23 @@ using System.Windows.Shapes;
 namespace Manager
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Логика взаимодействия для DataPage.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class DataPage : Page
     {
-        public MainWindow()
+        public DataPage()
         {
             InitializeComponent();
-            mainFrame.Navigate(new DataPage());
+        }
+
+        private void addCategory_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddCategory());
+        }
+
+        private void addWord_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddWord());
         }
     }
 }

@@ -13,17 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Manager
+namespace Manager.View
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Логика взаимодействия для AddWord.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class AddWord : Page
     {
-        public MainWindow()
+        public AddWord()
         {
             InitializeComponent();
-            mainFrame.Navigate(new DataPage());
+        }
+
+        private void back_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
         }
     }
 }
