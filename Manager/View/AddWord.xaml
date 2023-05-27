@@ -36,7 +36,7 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
-            <Button x:Name="back" DockPanel.Dock="Left" Content="Назад" Height="25" Width="80" Margin="10 0" Click="back_Click"/>
+            <Button x:Name="back" DockPanel.Dock="Left" Content="Назад" Height="25" Width="80" Margin="10 0" Click="back_Click" IsCancel="True" />
             <TextBlock Text="Заполните поля для добавления слова" Style="{DynamicResource header}" Margin="-100 0 0 0"/>
         </DockPanel>
 

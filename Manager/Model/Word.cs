@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Manager.Model
 {
-    internal class Word
+    public class Word
     {
         public int Id { get; set; }
         public string? CategoryName { get; set; }

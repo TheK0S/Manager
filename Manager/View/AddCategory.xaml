@@ -13,21 +13,7 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="DemiBold"/>
-        </Style>
-        <Style TargetType="TextBox">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border CornerRadius="10"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        </Style>        
     </Page.Resources>
     <Grid Background="AliceBlue">
         <Grid.RowDefinitions>
@@ -36,12 +22,20 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
-            <Button x:Name="back" DockPanel.Dock="Left" Content="Назад" Height="25" Width="80" Margin="10 0" Click="back_Click"/>
+            <Button x:Name="back" DockPanel.Dock="Left" Content="Назад" Height="25" Width="80" Margin="10 0" Click="back_Click" IsCancel="True"/>
             <TextBlock Text="Заполните поля для добавления каиегории" Style="{DynamicResource header}" Margin="-100 0 0 0"/>
         </DockPanel>
 
-        <StackPanel Grid.Row="1">
-
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
+                <TextBlock Text="Уровень языка:" Margin="0 0 10 0"/>
+                <ComboBox x:Name="langLevel" Width="150"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Название категории:" Margin="0 0 10 0"/>
+                <TextBox x:Name="categoryNameField" Width="150"/>
+            </StackPanel>
+            <Button x:Name="addCategory" Content="Добавить" Width="100" Height="20" Margin="10"/>
         </StackPanel>
     </Grid>
 </Page>

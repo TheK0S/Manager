@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace Manager.Model
 {
-    internal class Level
+    public class Level
     {
         public int Id { get; set; }
         public string LevelName { get; set; }
+
+        public override string ToString()
+        {
+            return LevelName;
+        }
     }
 }

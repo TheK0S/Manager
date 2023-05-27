@@ -23,7 +23,6 @@ namespace Manager
     public partial class DataPage : Page
     {
         List<Category> categories = new List<Category>();
-        List<string> categoryNames = new List<string>();
         List<Level> levels = new List<Level>();
         Dictionary<string, List<Word>> wordTables = new Dictionary<string, List<Word>>();
 
@@ -39,14 +38,11 @@ namespace Manager
             categories = Data.GetCategories();          
 
             
-            foreach (var item in categories)
-                categoryNames.Add(item.CategoriesName);
-
             foreach (var category in categories)
                 wordTables.Add(category.CategoriesName, Data.GetWords(category.CategoriesName));
 
             categoryGrid.ItemsSource = categories;
-            wordCategory.ItemsSource = categoryNames;
+            wordCategory.ItemsSource = categories;
 
             if (categories?.Count > 0)
             {              
@@ -58,7 +54,7 @@ namespace Manager
 
         private void addCategory_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddCategory());
+            NavigationService.Navigate(new AddCategory(in levels));
         }
 
         private void addWord_Click(object sender, RoutedEventArgs e)
