@@ -1,5 +1,4 @@
 ﻿using Manager.Model;
-using Manager.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,31 +34,61 @@ namespace Manager
             
 
             levels = Data.GetLevels();
-            categories = Data.GetCategories();          
+            categories = Data.GetCategories();        
 
-            
-            foreach (var category in categories)
-                wordTables.Add(category.CategoriesName, Data.GetWords(category.CategoriesName));
+            if(categories != null )
+                foreach (var category in categories)
+                    wordTables.Add(category.CategoriesName, Data.GetWords(category.CategoriesName));
 
             categoryGrid.ItemsSource = categories;
             wordCategory.ItemsSource = categories;
-
-            if (categories?.Count > 0)
-            {              
-                categoryGrid.SelectedItem = categories[0];
-                wordGrid.ItemsSource = wordTables[categories[0].CategoriesName];
-            }    
+            langLevel.ItemsSource = levels;             
 
         }
 
         private void addCategory_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddCategory(in levels));
+            
         }
 
         private void addWord_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new AddWord());
+            
+        }
+
+        private void updateCategory_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void removeCategory_Click(object sender, RoutedEventArgs e)
+        {
+            Data.RemoveCategory((Category) categoryGrid.SelectedItem);
+            categories = Data.GetCategories();
+        }
+
+        private void updateWord_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void removeWord_Click(object sender, RoutedEventArgs e)
+        {
+            Word word = (Word) wordGrid.SelectedItem;
+            Data.RemoveWord(word);
+
+            if (word.CategoryName != null)
+                wordTables[word.CategoryName] = Data.GetWords(word.CategoryName);
+        }
+
+        private void wordCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (wordCategory.SelectedItem != null)
+            {
+                Category category = (Category)wordCategory.SelectedItem;
+                if (category.CategoriesName != null)
+                    wordGrid.ItemsSource = wordTables[category.CategoriesName];
+            }                
         }
     }
 }

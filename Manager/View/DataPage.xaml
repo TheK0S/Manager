@@ -15,6 +15,11 @@
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="DemiBold"/>
         </Style>
+        <Style x:Key="bottomTextBlock" TargetType="TextBlock">
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Margin" Value="0 0 10 0"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
         <Style TargetType="Button">
             <Setter Property="Width" Value="160"/>
             <Setter Property="Height" Value="20"/>
@@ -45,7 +50,9 @@
 
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBlock Text="Категория:" VerticalAlignment="Center" Margin="10"/>
-            <ComboBox x:Name="wordCategory" Height="25" Width="200" Margin="10"/>
+            <ComboBox x:Name="wordCategory" Height="25" Width="200" Margin="10"
+                      SelectedItem="{Binding ElementName= categoryGrid, Path=SelectedItem}"
+                      SelectionChanged="wordCategory_SelectionChanged"/>
             <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="50 10 10 10"/>
             <TextBox x:Name="wordSearchField" Height="25" Width="350" Margin="10" VerticalContentAlignment="Center"/>
         </StackPanel>
@@ -68,42 +75,67 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">            
-            <Button x:Name="updateCategory">
-                <TextBlock TextWrapping="Wrap" Text="Редактировать категорию" Margin="2" TextAlignment="Center"/>
-            </Button>
-            <Button x:Name="removeCategory">
-                <TextBlock TextWrapping="Wrap" Text="Удалить категорию" Margin="2" TextAlignment="Center"/>
-            </Button>
+        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="updateCategory" Content="Редактировать категорию" Click="updateCategory_Click"/>
+            <Button x:Name="removeCategory" Content="Удалить категорию" Click="removeCategory_Click"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="addWord" Click="addWord_Click">
-                <TextBlock TextWrapping="Wrap" Text="Добавить слово" Margin="2" TextAlignment="Center"/>
-            </Button>
-            <Button x:Name="updateWord">
-                <TextBlock TextWrapping="Wrap" Text="Редактировать слово" Margin="2" TextAlignment="Center"/>
-            </Button>
-            <Button x:Name="removeWord">
-                <TextBlock TextWrapping="Wrap" Text="Удалить слово" Margin="2" TextAlignment="Center"/>
-            </Button>
+        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">            
+            <Button x:Name="updateWord" Content="Редактировать слово" Click="updateWord_Click"/>
+            <Button x:Name="removeWord" Content="Удалить слово" Click="removeWord_Click"/>
         </StackPanel>
 
         <TextBlock Grid.Row="4" Grid.Column="0" Text="Добавить категорию" Style="{StaticResource header}"/>
         <TextBlock Grid.Row="4" Grid.Column="1" Text="Добавить слово в категорию" Style="{StaticResource header}"/>
 
-        <StackPanel Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" Margin="0 10">
             <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
                 <TextBlock Text="Уровень языка:" Margin="0 0 10 0"/>
-                <ComboBox x:Name="langLevel" Width="150"/>
+                <ComboBox x:Name="langLevel" Width="200"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="10">
                 <TextBlock Text="Название категории:" Margin="0 0 10 0"/>
-                <TextBox x:Name="categoryNameField" Width="150"/>
+                <TextBox x:Name="categoryNameField" Width="200"/>
             </StackPanel>
-            <Button x:Name="addCategory" Click="addCategory_Click">
-                <TextBlock TextWrapping="Wrap" Text="Добавить категорию" Margin="2" TextAlignment="Center"/>
-            </Button>
+            <Button x:Name="addCategory" Content="Добавить категорию" Click="addCategory_Click"/>
         </StackPanel>
+
+        <Grid Grid.Row="5" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.8*"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="10">
+                <StackPanel Orientation="Horizontal"  Margin="10">
+                    <TextBlock Text="Название категории:" Style="{StaticResource bottomTextBlock}"/>
+                    <ComboBox x:Name="categoryNameOfWord" Width="200" ItemsSource="{Binding ElementName= wordCategory, Path=ItemsSource}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <TextBlock Text="Слово в оригинале:" Style="{StaticResource bottomTextBlock}"/>
+                    <TextBox x:Name="wordsField" Width="200"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <TextBlock Text="Перевод слова:" Style="{StaticResource bottomTextBlock}"/>
+                    <TextBox x:Name="translateWordsField" Width="200"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="10">
+                <StackPanel Orientation="Horizontal"  Margin="10">
+                    <TextBlock Text="Транскрипция:" Style="{StaticResource bottomTextBlock}"/>
+                    <TextBox x:Name="transcriptionsField" Width="300"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <TextBlock Text="Предложение в оригинале:" Style="{StaticResource bottomTextBlock}"/>
+                    <TextBox x:Name="sentenceField" Width="300"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10">
+                    <TextBlock Text="Перевод предложения:" Style="{StaticResource bottomTextBlock}"/>
+                    <TextBox x:Name="transSentenceField" Width="300"/>
+                </StackPanel>
+            </StackPanel>
+            <Button x:Name="addWord" Grid.Column="2" Content="Добавить слово" Click="addWord_Click" VerticalAlignment="Top" Margin="20"/>
+        </Grid>
     </Grid>
 </Page>

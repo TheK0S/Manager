@@ -66,5 +66,37 @@ namespace Manager.Model
                 return new List<Word>();
             }
         }
+
+        public static void RemoveCategory(Category category)
+        {
+            try
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    string sqlCommand = $"DELETE FROM Categories WHERE Categories.Id = {category.Id}";
+                    MessageBox.Show($"Категория {category.CategoriesName} удалена", "Выполнено");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при удалении категории", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public static void RemoveWord(Word word)
+        {
+            try
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    string sqlCommand = $"DELETE FROM {word.CategoryName} WHERE {word.CategoryName}.Id = {word.Id}";
+                    MessageBox.Show($"Слово {word.Words} удалено", "Выполнено");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при удалении слова", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }
