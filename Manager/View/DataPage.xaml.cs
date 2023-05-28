@@ -92,6 +92,8 @@ namespace Manager
                         else
                         {
                             Data.UpdateCategory(category, item, isShowSuccessfulOperations);
+                            categoryGrid.ItemsSource = Data.GetCategories();
+                            wordCategory.ItemsSource = Data.GetCategories();
                             break;
                         }
                     }
