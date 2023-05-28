@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using Dapper;
 using System.Data.SqlClient;
+using static Dapper.SqlMapper;
+using System.Windows.Input;
 
 namespace Manager.Model
 {
@@ -62,35 +64,102 @@ namespace Manager.Model
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка при загрузке категорий", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Ошибка при загрузке списка слов", MessageBoxButton.OK, MessageBoxImage.Error);
                 return new List<Word>();
             }
         }
 
-        public static void RemoveCategory(Category category)
+        public static bool RemoveCategory(Category category, bool isShowSuccessful)
         {
             try
             {
                 using (IDbConnection db = new SqlConnection(connectionString))
                 {
                     string sqlCommand = $"DELETE FROM Categories WHERE Categories.Id = {category.Id}";
-                    MessageBox.Show($"Категория {category.CategoriesName} удалена", "Выполнено");
+                    db.Query<Category>(sqlCommand);
+
+                    if(isShowSuccessful)
+                        MessageBox.Show($"Категория {category.CategoriesName} удалена", "Выполнено");
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка при удалении категории", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
         }
 
-        public static void RemoveWord(Word word)
+        public static bool RemoveWord(Word word, bool isShowSuccessful)
         {
             try
             {
                 using (IDbConnection db = new SqlConnection(connectionString))
                 {
                     string sqlCommand = $"DELETE FROM {word.CategoryName} WHERE {word.CategoryName}.Id = {word.Id}";
-                    MessageBox.Show($"Слово {word.Words} удалено", "Выполнено");
+                    db.Query<Word>(sqlCommand);
+
+                    if(isShowSuccessful)
+                        MessageBox.Show($"Слово {word.Words} удалено", "Выполнено");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при удалении слова", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        public static void CreateCategory(Category category, bool isShowSuccessful)
+        {
+            try
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    string sqlCommand = $"INSERT INTO Categories VALUES({category.LevelsId},'{category.CategoriesName}')";
+                    db.Query(sqlCommand);
+
+                    sqlCommand = $"CREATE TABLE {category.CategoriesName} (" +
+                        $"Id INT IDENTITY PRIMARY KEY," +
+                        $" CategoryName NVARCHAR(50) REFERENCES Categories(CategoriesName) ON DELETE CASCADE," +
+                        $" Words NVARCHAR(20) NOT NULL," +
+                        $" Transcriptions NVARCHAR(50) NOT NULL," +
+                        $" Sentence NVARCHAR(120) NOT NULL," +
+                        $" TranslateWords NVARCHAR(20) NOT NULL," +
+                        $" TransSentence NVARCHAR(120) NOT NULL )";
+
+                    db.Query(sqlCommand);
+
+                    if(isShowSuccessful)
+                        MessageBox.Show($"Категория {category.CategoriesName} создана", "Выполнено");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при создании категории", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public static void UpdateCategory(Category newCategory, Category oldCategory, bool isShowSuccessful)
+        {
+            try
+            {               
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {                    
+                    CreateCategory(newCategory, false);
+
+                    string sqlCommand = $"INSERT INTO {newCategory.CategoriesName} " +
+                        $"SELECT '{newCategory.CategoriesName}', Words, Transcriptions, Sentence, TranslateWords, TransSentence" +
+                        $" from {oldCategory.CategoriesName}";
+                    db.Query<Category>(sqlCommand);
+
+                    if(!RemoveCategory(oldCategory, false))
+                        MessageBox.Show($"Не удалена категория с именем {oldCategory.CategoriesName}", "Ошибка при удалении категории",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    if (isShowSuccessful)
+                        MessageBox.Show($"Категория изменена", "Выполнено");
                 }
             }
             catch (Exception ex)
