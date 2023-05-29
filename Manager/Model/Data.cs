@@ -16,7 +16,7 @@ namespace Manager.Model
 {
     class Data
     {
-        static string connectionString = @"Data Source = DESKTOP-K60TA32\SQLEXPRESS; Initial Catalog = WordsDB; Trusted_Connection=True; Encrypt = False";
+        static string connectionString = @"Data Source = DESKTOP-HHO6PH0; Initial Catalog = WordsDB; Trusted_Connection=True; Encrypt = False";
 
         public static List<Level> GetLevels()
         {
@@ -164,7 +164,63 @@ namespace Manager.Model
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка при удалении слова", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Ошибка при изменении категории", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public static bool AddWord(Word word, bool isShowSuccessful)
+        {
+            try
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    string sqlCommand = $"INSERT INTO {word.CategoryName} VALUES (" +
+                        $"'{word.CategoryName}', " +
+                        $"'{word.Words}', " +
+                        $"N'{word.Transcriptions}', " +
+                        $"'{word.Sentence}', " +
+                        $"'{word.TranslateWords}', " +
+                        $"'{word.TransSentence}')";
+
+                    db.Query<Word>(sqlCommand);
+
+                    if (isShowSuccessful)
+                        MessageBox.Show($"Слово {word.Words} добавлено", "Выполнено");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при добавлении слова", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+
+        public static bool UpdateWord(Word newWord, Word oldWord, bool isShowSuccessful)
+        {
+            try
+            {
+                using (IDbConnection db = new SqlConnection(connectionString))
+                {
+                    string sqlCommand = $"UPDATE {oldWord.CategoryName} SET " +
+                        $"CategoryName = '{oldWord.CategoryName}', " +
+                        $"Words = '{newWord.Words}', " +
+                        $"Transcriptions = N'{newWord.Transcriptions}', " +
+                        $"Sentence = '{newWord.Sentence}', " +
+                        $"TranslateWords = '{newWord.TranslateWords}', " +
+                        $"TransSentence = '{newWord.TransSentence}'";
+
+                    db.Query<Word>(sqlCommand);
+
+                    if (isShowSuccessful)
+                        MessageBox.Show($"Слово {oldWord.Words} изменено", "Выполнено");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при изменении слова", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
         }
     }

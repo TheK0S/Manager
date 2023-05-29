@@ -43,7 +43,8 @@ namespace Manager
 
             categoryGrid.ItemsSource = Data.GetCategories();
             wordCategory.ItemsSource = Data.GetCategories();
-            langLevel.ItemsSource = levels;             
+            langLevel.ItemsSource = levels;
+            categoryNameOfWord.ItemsSource = Data.GetCategories();
 
         }
 
@@ -72,7 +73,78 @@ namespace Manager
 
         private void addWord_Click(object sender, RoutedEventArgs e)
         {
-            
+            if(categoryNameOfWord.SelectedItem != null)
+            {
+                if(wordsField.Text?.Length > 0)
+                {
+                    if(translateWordsField.Text?.Length > 0)
+                    {
+                        if(transcriptionsField.Text?.Length > 0)
+                        {
+                            if (sentenceField.Text?.Length > 0)
+                            {
+                                if (transSentenceField.Text?.Length > 0)
+                                {
+                                    string transcription = "";
+                                    transcription = transcriptionsField.Text;
+
+                                    Word word = new Word
+                                    {
+                                        Id = 0,
+                                        CategoryName = categoryNameOfWord.Text,
+                                        Words = wordsField.Text,
+                                        Transcriptions = transcription,
+                                        Sentence = sentenceField.Text,
+                                        TranslateWords = translateWordsField.Text,
+                                        TransSentence = transSentenceField.Text
+                                    };
+
+                                    Data.AddWord(word, isShowSuccessfulOperations);
+
+                                    if (wordTables[word.CategoryName] != null)
+                                    {
+                                        wordTables[word.CategoryName] = Data.GetWords(word.CategoryName);
+
+                                        wordCategory.SelectedItem = categories.FirstOrDefault(c => c.CategoriesName == word.CategoryName);
+                                        wordGrid.ItemsSource = wordTables[word.CategoryName];
+                                    }
+                                                                                
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Введите перевод предложения", "Пустое поле \"Перевод предложения\"",
+                                    MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Введите предложение на иностранном", "Пустое поле \"Предложение в оригинале\"",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Введите транскрипцию слова", "Пустое поле \"Транскрипция\"",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Введите перевод слова", "Пустое поле \"Перевод слова\"",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Введите оригинал слова", "Пустое поле \"Слово в оригинале\"",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Виберите категорию слов и повторите попытку", "Не выбрана категория",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void updateCategory_Click(object sender, RoutedEventArgs e)
