@@ -57,6 +57,7 @@ namespace Manager
                 {
                     Data.CreateCategory(new Category { Id = 0, LevelsId = level.Id, CategoriesName = categoryNameField.Text }, isShowSuccessfulOperations);
                     categoryGrid.ItemsSource = Data.GetCategories();
+                    wordCategory.ItemsSource = Data.GetCategories();
                 }
                 else
                 {
