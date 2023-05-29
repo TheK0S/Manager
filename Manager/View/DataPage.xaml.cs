@@ -243,5 +243,38 @@ namespace Manager
         {
             isShowSuccessfulOperations = true;
         }
+
+        private void wordSearchField_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Category category = (Category)wordCategory.SelectedItem;
+            if (category != null)
+            {
+                List<Word> words = Data.GetWords(category.CategoriesName);
+
+                if (wordSearchField.Text?.Length > 0)
+                {
+                    wordGrid.ItemsSource = words.FindAll(w => w.Words.ToLower().Contains(wordSearchField.Text.ToLower())
+                    || w.TranslateWords.ToLower().Contains(wordSearchField.Text.ToLower()));
+                }
+                else
+                {
+                    wordGrid.ItemsSource = words;
+                }
+            }
+        }
+
+        private void categorySearchField_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            List<Category> categoriesTemp = Data.GetCategories();
+
+            if(categorySearchField.Text?.Length > 0)
+            {
+                categoryGrid.ItemsSource = categoriesTemp.FindAll(c => c.CategoriesName.ToLower().Contains(categorySearchField.Text.ToLower()));
+            }
+            else
+            {
+                categoryGrid.ItemsSource = categoriesTemp;
+            }
+        }
     }
 }

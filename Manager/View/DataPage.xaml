@@ -37,7 +37,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="0.1*"/>
             <RowDefinition Height="0.05*"/>
-            <RowDefinition Height="0.3*"/>
+            <RowDefinition Height="0.4*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Категории" Style="{StaticResource header}"/>
@@ -45,7 +45,7 @@
 
         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBlock Text="Поиск:" DockPanel.Dock="Left" VerticalAlignment="Center" Margin="10"/>
-            <TextBox x:Name="categorySearchField" Height="25" Width="300" Margin="10" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="categorySearchField" Height="25" Width="300" Margin="10" VerticalContentAlignment="Center" TextChanged="categorySearchField_TextChanged"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left">
@@ -53,7 +53,7 @@
             <ComboBox x:Name="wordCategory" Height="25" Width="200" Margin="10"
                       SelectionChanged="wordCategory_SelectionChanged"/>
             <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="50 10 10 10"/>
-            <TextBox x:Name="wordSearchField" Height="25" Width="350" Margin="10" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="wordSearchField" Height="25" Width="350" Margin="10" VerticalContentAlignment="Center" TextChanged="wordSearchField_TextChanged"/>
             <CheckBox x:Name="isShowSuccOperations" Content="Показывать уведомления об успешных операциях"
                       IsChecked="True" VerticalAlignment="Center" Margin="50 0 0 0"
                       Unchecked="isShowSuccOperations_Unchecked" Checked="isShowSuccOperations_Checked"/>
@@ -103,41 +103,47 @@
         </StackPanel>
 
         <Grid Grid.Row="5" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="0.35*"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.8*"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="0.6*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Margin="10">
-                <StackPanel Orientation="Horizontal"  Margin="10">
+            <StackPanel Grid.Column="0" Grid.Row="0" Margin="0 10">
+                <StackPanel Orientation="Horizontal"  Margin="0 10">
                     <TextBlock Text="Название категории:" Style="{StaticResource bottomTextBlock}"/>
                     <ComboBox x:Name="categoryNameOfWord" Width="200" ItemsSource="{Binding ElementName= wordCategory, Path=ItemsSource}"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="10">
+                <StackPanel Orientation="Horizontal" Margin="0 10">
                     <TextBlock Text="Слово в оригинале:" Style="{StaticResource bottomTextBlock}"/>
                     <TextBox x:Name="wordsField" Width="200"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="10">
+                <StackPanel Orientation="Horizontal" Margin="0 10">
                     <TextBlock Text="Перевод слова:" Style="{StaticResource bottomTextBlock}"/>
                     <TextBox x:Name="translateWordsField" Width="200"/>
                 </StackPanel>
             </StackPanel>
-            <StackPanel Grid.Column="1" Margin="10">
-                <StackPanel Orientation="Horizontal"  Margin="10">
+            <StackPanel Grid.Column="1" Grid.Row="0" Margin="0 10">
+                <StackPanel Orientation="Horizontal"  Margin="0 10">
                     <TextBlock Text="Транскрипция:" Style="{StaticResource bottomTextBlock}"/>
                     <TextBox x:Name="transcriptionsField" Width="300"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="10">
+                <StackPanel Orientation="Horizontal" Margin="0 10">
                     <TextBlock Text="Предложение в оригинале:" Style="{StaticResource bottomTextBlock}"/>
                     <TextBox x:Name="sentenceField" Width="300"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="10">
+                <StackPanel Orientation="Horizontal" Margin="0 10">
                     <TextBlock Text="Перевод предложения:" Style="{StaticResource bottomTextBlock}"/>
                     <TextBox x:Name="transSentenceField" Width="300"/>
                 </StackPanel>
             </StackPanel>
-            <Button x:Name="addWord" Grid.Column="2" Content="Добавить слово" Click="addWord_Click" VerticalAlignment="Top" Margin="20"/>
+            <Image x:Name="imageWord" Grid.Row="0" Grid.Column="2" Margin="10" Source="/image/default_picture.png" Stretch="Uniform"/>
+            <Button x:Name="addWord" Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить слово" Click="addWord_Click" VerticalAlignment="Top"/>
+            <Button x:Name="addImage" Grid.Row="1" Grid.Column="2" Content="Добавить картинку" VerticalAlignment="Top"/>
         </Grid>
     </Grid>
 </Page>
