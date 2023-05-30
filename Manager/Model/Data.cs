@@ -16,8 +16,8 @@ namespace Manager.Model
 {
     class Data
     {
-        static string connectionString = @"Data Source=SQL5110.site4now.net;Initial Catalog=db_a9a0f7_diplomawork;User Id=db_a9a0f7_diplomawork_admin;Password=uchiha322";
-        //static string connectionString = @"Data Source = DESKTOP-HHO6PH0; Initial Catalog = WordsDB; Trusted_Connection=True; Encrypt = False";
+        //static string connectionString = @"Data Source=SQL5110.site4now.net;Initial Catalog=db_a9a0f7_diplomawork;User Id=db_a9a0f7_diplomawork_admin;Password=uchiha322";
+        static string connectionString = @"Data Source = DESKTOP-HHO6PH0; Initial Catalog = WordsDB; Trusted_Connection=True; Encrypt = False";
 
         public static List<Level> GetLevels()
         {
@@ -95,10 +95,19 @@ namespace Manager.Model
         {
             try
             {
-                using (IDbConnection db = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sqlCommand = $"DELETE FROM {word.CategoryName} WHERE {word.CategoryName}.Id = {word.Id}";
-                    db.Query<Word>(sqlCommand);
+                    connection.Open();
+
+                    SqlCommand command = new SqlCommand();
+
+                    command.CommandText = $"DROP TABLE {word.CategoryName}";
+                    command.ExecuteNonQuery();
+                                        
+                    command.CommandText = $"DELETE FROM {word.CategoryName} WHERE {word.CategoryName}.Id = {word.Id}";
+                    command.ExecuteNonQuery();                    
+
+                    connection.Close();
 
                     if(isShowSuccessful)
                         MessageBox.Show($"Слово {word.Words} удалено", "Выполнено");
@@ -109,7 +118,7 @@ namespace Manager.Model
             {
                 MessageBox.Show(ex.Message, "Ошибка при удалении слова", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
-            }
+            }            
         }
 
         public static void CreateCategory(Category category, bool isShowSuccessful)
@@ -128,7 +137,8 @@ namespace Manager.Model
                         $" Transcriptions NVARCHAR(50) NOT NULL," +
                         $" Sentence NVARCHAR(120) NOT NULL," +
                         $" TranslateWords NVARCHAR(20) NOT NULL," +
-                        $" TransSentence NVARCHAR(120) NOT NULL )";
+                        $" TransSentence NVARCHAR(120) NOT NULL," +
+                        $" Picture VARBINARY(MAX) NOT NULL)";
 
                     db.Query(sqlCommand);
 
@@ -173,17 +183,25 @@ namespace Manager.Model
         {
             try
             {
-                using (IDbConnection db = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sqlCommand = $"INSERT INTO {word.CategoryName} VALUES (" +
+                    connection.Open();
+
+                    SqlCommand command = connection.CreateCommand();
+                    command.CommandText = $"INSERT INTO {word.CategoryName} (CategoryName, Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture) " +
+                        $"VALUES (" +
                         $"'{word.CategoryName}', " +
                         $"'{word.Words}', " +
                         $"N'{word.Transcriptions}', " +
                         $"'{word.Sentence}', " +
                         $"'{word.TranslateWords}', " +
-                        $"'{word.TransSentence}')";
+                        $"'{word.TransSentence}', " +
+                        $"@Picture)";
 
-                    db.Query<Word>(sqlCommand);
+                    command.Parameters.Add("@Picture", SqlDbType.VarBinary, 1000000);
+                    command.Parameters["@Picture"].Value = word.Picture;
+
+                    command.ExecuteNonQuery();
 
                     if (isShowSuccessful)
                         MessageBox.Show($"Слово {word.Words} добавлено", "Выполнено");

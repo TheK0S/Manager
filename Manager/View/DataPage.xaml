@@ -74,6 +74,7 @@
                 <DataGridTextColumn Header="Предложение" Binding="{Binding Sentence}"/>
                 <DataGridTextColumn Header="Перевод слова" Binding="{Binding TranslateWords}"/>
                 <DataGridTextColumn Header="Перевод предложения" Binding="{Binding TransSentence}"/>
+                <DataGridTextColumn Header="Картинка" Binding="{Binding Picture}"/>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -141,9 +142,9 @@
                     <TextBox x:Name="transSentenceField" Width="300"/>
                 </StackPanel>
             </StackPanel>
-            <Image x:Name="imageWord" Grid.Row="0" Grid.Column="2" Margin="10" Source="/image/default_picture.png" Stretch="Uniform"/>
+            <Image x:Name="imageWord" Grid.Row="0" Grid.Column="2" Margin="10" Stretch="Uniform" Source="\image\default_picture.png"/>
             <Button x:Name="addWord" Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить слово" Click="addWord_Click" VerticalAlignment="Top"/>
-            <Button x:Name="addImage" Grid.Row="1" Grid.Column="2" Content="Добавить картинку" VerticalAlignment="Top"/>
+            <Button x:Name="addImage" Grid.Row="1" Grid.Column="2" Content="Добавить картинку" VerticalAlignment="Top" Click="addImage_Click"/>
         </Grid>
     </Grid>
 </Page>

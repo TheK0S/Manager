@@ -1,6 +1,8 @@
 ﻿using Manager.Model;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Manager
 {
@@ -22,6 +25,7 @@ namespace Manager
     public partial class DataPage : Page
     {
         bool isShowSuccessfulOperations = true;
+        string ImgLoc = "";
         List<Category> categories = new List<Category>();
         List<Level> levels = new List<Level>();
         Dictionary<string, List<Word>> wordTables = new Dictionary<string, List<Word>>();
@@ -56,8 +60,11 @@ namespace Manager
                 if(categoryNameField.Text?.Length > 0)
                 {
                     Data.CreateCategory(new Category { Id = 0, LevelsId = level.Id, CategoriesName = categoryNameField.Text }, isShowSuccessfulOperations);
-                    categoryGrid.ItemsSource = Data.GetCategories();
-                    wordCategory.ItemsSource = Data.GetCategories();
+                    List<Category> tempCtegory = Data.GetCategories();
+                    categoryGrid.ItemsSource = tempCtegory.ToList();
+                    wordCategory.ItemsSource = tempCtegory.ToList();
+                    categoryNameOfWord.ItemsSource = tempCtegory.ToList();
+                    categories = tempCtegory.ToList();
                 }
                 else
                 {
@@ -88,6 +95,15 @@ namespace Manager
                                 {
                                     string transcription = "";
                                     transcription = transcriptionsField.Text;
+                                    if(!(ImgLoc?.Length > 0))
+                                    {
+                                        ImgLoc = "\\image\\default_picture.png";
+                                    }
+
+                                    byte[] image = null;
+                                    FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
+                                    BinaryReader binaryReader = new BinaryReader(file);
+                                    image = binaryReader.ReadBytes((int)file.Length);
 
                                     Word word = new Word
                                     {
@@ -97,7 +113,8 @@ namespace Manager
                                         Transcriptions = transcription,
                                         Sentence = sentenceField.Text,
                                         TranslateWords = translateWordsField.Text,
-                                        TransSentence = transSentenceField.Text
+                                        TransSentence = transSentenceField.Text,
+                                        Picture = image
                                     };
 
                                     Data.AddWord(word, isShowSuccessfulOperations);
@@ -165,8 +182,12 @@ namespace Manager
                         else
                         {
                             Data.UpdateCategory(category, item, isShowSuccessfulOperations);
-                            categoryGrid.ItemsSource = Data.GetCategories();
-                            wordCategory.ItemsSource = Data.GetCategories();
+
+                            List<Category> tempCtegory = Data.GetCategories();
+                            categoryGrid.ItemsSource = tempCtegory.ToList();
+                            wordCategory.ItemsSource = tempCtegory.ToList();
+                            categoryNameOfWord.ItemsSource = tempCtegory.ToList();
+                            categories = tempCtegory.ToList();
                             break;
                         }
                     }
@@ -184,8 +205,12 @@ namespace Manager
             if(categoryGrid.SelectedItem != null)
             {
                 Data.RemoveCategory((Category)categoryGrid.SelectedItem, isShowSuccessfulOperations);
-                categoryGrid.ItemsSource = Data.GetCategories();
-                categories = Data.GetCategories();
+
+                List<Category> tempCtegory = Data.GetCategories();
+                categoryGrid.ItemsSource = tempCtegory.ToList();
+                wordCategory.ItemsSource = tempCtegory.ToList();
+                categoryNameOfWord.ItemsSource = tempCtegory.ToList();
+                categories = tempCtegory.ToList();
             }
             else
             {
@@ -274,6 +299,53 @@ namespace Manager
             else
             {
                 categoryGrid.ItemsSource = categoriesTemp;
+            }
+        }
+
+        private void addImage_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //OpenFileDialog ofdPicture = new OpenFileDialog();
+                //ofdPicture.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
+                //ofdPicture.FilterIndex = 1;
+
+                //if (ofdPicture.ShowDialog() == true)
+                //    imageWord.Source = new BitmapImage(new Uri(ofdPicture.FileName));
+
+                //ImgLoc = ofdPicture.FileName.ToString();
+
+                OpenFileDialog ofdPicture = new OpenFileDialog();
+                ofdPicture.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
+                ofdPicture.FilterIndex = 1;
+
+                if (ofdPicture.ShowDialog() == true)
+                {
+                    ImgLoc = ofdPicture.FileName.ToString();
+
+                    byte[] img = null;
+
+                    FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
+                    BinaryReader binaryReader = new BinaryReader(file);
+                    img = binaryReader.ReadBytes((int)file.Length);
+
+                    using (MemoryStream stream = new MemoryStream(img))
+                    {
+                        BitmapImage image = new BitmapImage();
+                        image.BeginInit();
+                        image.CacheOption = BitmapCacheOption.OnLoad;
+                        image.StreamSource = stream;
+                        image.EndInit();
+                        image.Freeze();
+                    }
+                }
+
+                                
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при загрузке картинки", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
