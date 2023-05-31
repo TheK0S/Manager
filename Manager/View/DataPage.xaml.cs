@@ -47,10 +47,10 @@ namespace Manager
                 foreach (var category in categories)
                     wordTables.Add(category.CategoriesName, Data.GetWords(category.CategoriesName));
 
-            categoryGrid.ItemsSource = Data.GetCategories();
-            wordCategory.ItemsSource = Data.GetCategories();
+            categoryGrid.ItemsSource = categories.ToList();
+            wordCategory.ItemsSource = categories.ToList();
             langLevel.ItemsSource = levels;
-            categoryNameOfWord.ItemsSource = Data.GetCategories();
+            categoryNameOfWord.ItemsSource = categories.ToList();
 
         }
 
