@@ -1,7 +1,9 @@
 ﻿using Manager.Model;
 using Microsoft.Win32;
+using Svg;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -306,41 +308,20 @@ namespace Manager
         {
             try
             {
-                //OpenFileDialog ofdPicture = new OpenFileDialog();
-                //ofdPicture.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
-                //ofdPicture.FilterIndex = 1;
-
-                //if (ofdPicture.ShowDialog() == true)
-                //    imageWord.Source = new BitmapImage(new Uri(ofdPicture.FileName));
-
-                //ImgLoc = ofdPicture.FileName.ToString();
-
                 OpenFileDialog ofdPicture = new OpenFileDialog();
                 ofdPicture.Filter = "SVG files (*.svg)|*.svg|All files (*.*)|*.*";
                 ofdPicture.FilterIndex = 1;
 
                 if (ofdPicture.ShowDialog() == true)
                 {
-                    ImgLoc = ofdPicture.FileName.ToString();
-
-                    byte[] img = null;
-
-                    FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
-                    BinaryReader binaryReader = new BinaryReader(file);
-                    img = binaryReader.ReadBytes((int)file.Length);
-
-                    using (MemoryStream stream = new MemoryStream(img))
-                    {
-                        BitmapImage image = new BitmapImage();
-                        image.BeginInit();
-                        image.CacheOption = BitmapCacheOption.OnLoad;
-                        image.StreamSource = stream;
-                        image.EndInit();
-                        image.Freeze();
-                    }
+                    SvgDocument svgDocument = SvgDocument.Open(ofdPicture.FileName);
+                    var svgBitmap = svgDocument.Draw();
+                    var svgImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                        svgBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    imageWord.Source = svgImage;
                 }
 
-                                
+                ImgLoc = ofdPicture.FileName.ToString();
 
             }
             catch (Exception ex)
