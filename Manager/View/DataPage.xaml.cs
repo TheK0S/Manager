@@ -2,8 +2,10 @@
 using Microsoft.Win32;
 using Svg;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,6 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Manager
 {
@@ -35,13 +38,10 @@ namespace Manager
         public DataPage()
         {
             InitializeComponent();
-
-            categoryGrid.CanUserAddRows = false;
-            wordGrid.CanUserAddRows = false;
-            
+         
 
             levels = Data.GetLevels();
-            categories = Data.GetCategories();        
+            categories = Data.GetCategories();  
 
             if(categories != null )
                 foreach (var category in categories)
@@ -123,7 +123,7 @@ namespace Manager
 
                                     if (wordTables[word.CategoryName] != null)
                                     {
-                                        wordTables[word.CategoryName] = Data.GetWords(word.CategoryName);
+                                        wordTables.Add(word.CategoryName, Data.GetWords(word.CategoryName));
 
                                         wordCategory.SelectedItem = categories.FirstOrDefault(c => c.CategoriesName == word.CategoryName);
                                         wordGrid.ItemsSource = wordTables[word.CategoryName];
@@ -172,6 +172,9 @@ namespace Manager
             if(categoryGrid.SelectedItem != null)
             {
                 Category category = (Category)categoryGrid.SelectedItem;
+                Level selectedLevelId = (Level)langLevel.SelectedItem;
+                category.LevelsId = selectedLevelId.Id;
+                category.CategoriesName = categoryNameField.Text;
 
                 foreach (var item in categories)
                 {
@@ -223,7 +226,43 @@ namespace Manager
 
         private void updateWord_Click(object sender, RoutedEventArgs e)
         {
+            if(wordGrid.SelectedItem != null)
+            {
+                Word updateWord = (Word)wordGrid.SelectedItem;
 
+                updateWord.CategoryName = categoryNameOfWord.SelectedItem.ToString();
+                updateWord.Words = wordsField.Text;
+                updateWord.TranslateWords = translateWordsField.Text;
+                updateWord.Transcriptions = transcriptionsField.Text;
+                updateWord.Sentence = sentenceField.Text;
+                updateWord.TransSentence = transSentenceField.Text;
+
+                if (imageWord.Source.ToString().Contains(".svg"))
+                {
+                    FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
+                    BinaryReader binaryReader = new BinaryReader(file);
+                    updateWord.Picture = binaryReader.ReadBytes((int)file.Length);
+                }
+
+                Data.UpdateWord(updateWord, (Word)wordGrid.SelectedItem, isShowSuccessfulOperations);
+
+                if (wordTables.Keys.Contains(updateWord.CategoryName))
+                {
+                    wordTables[updateWord.CategoryName] = Data.GetWords(updateWord.CategoryName);
+
+                    if (wordCategory.SelectedItem != null)
+                    {
+                        Category category = (Category)wordCategory.SelectedItem;
+                        if (wordTables.Keys.Contains(category.CategoriesName))
+                            wordGrid.ItemsSource = wordTables[category.CategoriesName];
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Виберите слово в таблице и повторите попытку", "Не выбрано слово для редактирования",
+                                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void removeWord_Click(object sender, RoutedEventArgs e)
@@ -247,17 +286,9 @@ namespace Manager
         {
             if (wordCategory.SelectedItem != null)
             {
-                try
-                {
-                    Category category = (Category)wordCategory.SelectedItem;
-                    if (category.CategoriesName != null)
-                        wordGrid.ItemsSource = wordTables[category.CategoriesName];
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("После редактирования категории в таблице, не изменяйте выбор строки до нажатия кнопки \"Редактировать категорию\"",
-                        "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
+                Category category = (Category)wordCategory.SelectedItem;
+                if ( wordTables.Keys.Contains(category.CategoriesName))
+                    wordGrid.ItemsSource = wordTables[category.CategoriesName];
             }
         }
 
@@ -329,5 +360,38 @@ namespace Manager
                 MessageBox.Show(ex.Message, "Ошибка при загрузке картинки", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void wordGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(wordGrid.SelectedItem != null)
+            {
+                var selectedWord = (Word)wordGrid.SelectedItem;
+
+                categoryNameOfWord.SelectedItem = categories.FirstOrDefault(c => c.CategoriesName == selectedWord.CategoryName);
+                wordsField.Text = selectedWord.Words;
+                translateWordsField.Text = selectedWord.TranslateWords;
+                transcriptionsField.Text = selectedWord.Transcriptions;
+                sentenceField.Text = selectedWord.Sentence;
+                transSentenceField.Text = selectedWord.TransSentence;
+                imageWord.Source = Data.ByteArrToImageSource(selectedWord.Picture);                           
+            }
+        }               
+
+        private void categoryNameOfWord_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void categoryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(categoryGrid.SelectedItem != null)
+            {
+                var selectedCategory = (Category)categoryGrid.SelectedItem;
+
+                langLevel.SelectedItem = levels.FirstOrDefault(c => c.Id == selectedCategory.Id);
+                categoryNameField.Text = selectedCategory.CategoriesName;
+            }
+        }
+
     }
 }

@@ -11,6 +11,10 @@ using Dapper;
 using System.Data.SqlClient;
 using static Dapper.SqlMapper;
 using System.Windows.Input;
+using Svg;
+using System.IO;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace Manager.Model
 {
@@ -240,6 +244,26 @@ namespace Manager.Model
             {
                 MessageBox.Show(ex.Message, "Ошибка при изменении слова", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
+            }
+        }
+
+        public static ImageSource ByteArrToImageSource(byte[] byteArray)
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(byteArray))
+                {
+                    SvgDocument svgDocument = SvgDocument.Open<SvgDocument>(stream);
+                    var svgBitmap = svgDocument.Draw();
+                    var svgImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                        svgBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    return svgImage;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при приобразовании изображения");
+                return null;
             }
         }
     }

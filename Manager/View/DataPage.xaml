@@ -9,6 +9,11 @@
       Title="DataPage">
 
     <Page.Resources>
+        <local:ByteArrayToBitmapSourceConverter x:Key="ByteArrayToBitmapSourceConverter"/>
+        <local:LevelIdToLevelNameConverter x:Key="LevelIdToLevelNameConverter"/>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
         <Style x:Key="header" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -35,7 +40,6 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="0.1*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="0.1*"/>
             <RowDefinition Height="0.05*"/>
             <RowDefinition Height="0.4*"/>
         </Grid.RowDefinitions>
@@ -59,14 +63,22 @@
                       Unchecked="isShowSuccOperations_Unchecked" Checked="isShowSuccOperations_Checked"/>
         </StackPanel>
 
-        <DataGrid x:Name="categoryGrid" Grid.Row="2" Grid.Column="0" Margin="10" AutoGenerateColumns="False">
+        <DataGrid x:Name="categoryGrid" Grid.Row="2" Grid.Column="0" Margin="10"
+                  AutoGenerateColumns="False" 
+                  CanUserAddRows="False"
+                  IsReadOnly="True" 
+                  SelectionChanged="categoryGrid_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Уровень" Binding="{Binding LevelsId}" Width="80"/>
+                <DataGridTextColumn Header="Уровень" Binding="{Binding LevelsId, Converter={StaticResource LevelIdToLevelNameConverter}}" Width="80"/>
                 <DataGridTextColumn Header="Имя категории" Binding="{Binding CategoriesName}" Width="1*"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <DataGrid x:Name="wordGrid" Grid.Row="2" Grid.Column="1" Margin="10" AutoGenerateColumns="False">
+        <DataGrid x:Name="wordGrid" Grid.Row="2" Grid.Column="1" Margin="10"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True" 
+                  SelectionChanged="wordGrid_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}"/>
                 <DataGridTextColumn Header="Слово" Binding="{Binding Words}"/>
@@ -74,22 +86,19 @@
                 <DataGridTextColumn Header="Предложение" Binding="{Binding Sentence}"/>
                 <DataGridTextColumn Header="Перевод слова" Binding="{Binding TranslateWords}"/>
                 <DataGridTextColumn Header="Перевод предложения" Binding="{Binding TransSentence}"/>
-                <DataGridTextColumn Header="Картинка" Binding="{Binding Picture}"/>
+                <!--<DataGridTextColumn Header="Картинка" Binding="{Binding Picture}"/>-->
+                <DataGridTemplateColumn Header="Картинка">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Picture, Converter={StaticResource ByteArrayToBitmapSourceConverter}}" Width="30" Height="30"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
-        </DataGrid>
-
-        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="updateCategory" Content="Редактировать категорию" Click="updateCategory_Click"/>
-            <Button x:Name="removeCategory" Content="Удалить категорию" Click="removeCategory_Click"/>
-        </StackPanel>
-
-        <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">            
-            <Button x:Name="updateWord" Content="Редактировать слово" Click="updateWord_Click"/>
-            <Button x:Name="removeWord" Content="Удалить слово" Click="removeWord_Click"/>
-        </StackPanel>
-
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="Добавить категорию" Style="{StaticResource header}"/>
-        <TextBlock Grid.Row="4" Grid.Column="1" Text="Добавить слово в категорию" Style="{StaticResource header}"/>
+        </DataGrid>        
+      
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Добавить категорию" Style="{StaticResource header}"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Добавить слово в категорию" Style="{StaticResource header}"/>
 
         <StackPanel Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" Margin="0 10">
             <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Right">
@@ -100,7 +109,9 @@
                 <TextBlock Text="Название категории:" Margin="0 0 10 0"/>
                 <TextBox x:Name="categoryNameField" Width="200"/>
             </StackPanel>
-            <Button x:Name="addCategory" Content="Добавить категорию" Click="addCategory_Click"/>
+            <Button x:Name="addCategory" Content="Добавить категорию" Click="addCategory_Click" Margin="0 10 0 5"/>
+            <Button x:Name="updateCategory" Content="Редактировать категорию" Click="updateCategory_Click"/>
+            <Button x:Name="removeCategory" Content="Удалить категорию" Click="removeCategory_Click"/>
         </StackPanel>
 
         <Grid Grid.Row="5" Grid.Column="1">
@@ -114,10 +125,12 @@
                 <ColumnDefinition Width="0.6*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0" Grid.Row="0" Margin="0 10">
+            <StackPanel Grid.Column="0" Grid.Row="0" Margin="0 10" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal"  Margin="0 10">
                     <TextBlock Text="Название категории:" Style="{StaticResource bottomTextBlock}"/>
-                    <ComboBox x:Name="categoryNameOfWord" Width="200" ItemsSource="{Binding ElementName= wordCategory, Path=ItemsSource}"/>
+                    <ComboBox x:Name="categoryNameOfWord" Width="200" 
+                              ItemsSource="{Binding ElementName= wordCategory, Path=ItemsSource}" 
+                              SelectionChanged="categoryNameOfWord_SelectionChanged"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0 10">
                     <TextBlock Text="Слово в оригинале:" Style="{StaticResource bottomTextBlock}"/>
@@ -128,7 +141,7 @@
                     <TextBox x:Name="translateWordsField" Width="200"/>
                 </StackPanel>
             </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="0" Margin="0 10">
+            <StackPanel Grid.Column="1" Grid.Row="0" Margin="0 10" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal"  Margin="0 10">
                     <TextBlock Text="Транскрипция:" Style="{StaticResource bottomTextBlock}"/>
                     <TextBox x:Name="transcriptionsField" Width="300"/>
@@ -143,7 +156,12 @@
                 </StackPanel>
             </StackPanel>
             <Image x:Name="imageWord" Grid.Row="0" Grid.Column="2" Margin="10" Stretch="Uniform" Source="\image\default_picture.png"/>
-            <Button x:Name="addWord" Grid.Row="1" Grid.ColumnSpan="2" Content="Добавить слово" Click="addWord_Click" VerticalAlignment="Top"/>
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="top">
+                <Button x:Name="addWord" Content="Добавить слово" Click="addWord_Click"/>
+                <Button x:Name="updateWord" Content="Редактировать слово" Click="updateWord_Click"/>
+                <Button x:Name="removeWord" Content="Удалить слово" Click="removeWord_Click"/>
+            </StackPanel>
+            
             <Button x:Name="addImage" Grid.Row="1" Grid.Column="2" Content="Добавить картинку" VerticalAlignment="Top" Click="addImage_Click"/>
         </Grid>
     </Grid>
