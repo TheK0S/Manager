@@ -63,7 +63,7 @@ namespace Manager.Model
             {
                 using (IDbConnection db = new SqlConnection(connectionString))
                 {
-                    string sqlCommand = @"SELECT * FROM " + wordCategory;
+                    string sqlCommand = $"SELECT * FROM [{wordCategory}]";
                     return db.Query<Word>(sqlCommand).ToList();
                 }
             }
@@ -78,12 +78,21 @@ namespace Manager.Model
         {
             try
             {
-                using (IDbConnection db = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sqlCommand = $"DELETE FROM Categories WHERE Categories.Id = {category.Id}";
-                    db.Query<Category>(sqlCommand);
+                    connection.Open();
 
-                    if(isShowSuccessful)
+                    SqlCommand command = new SqlCommand();
+
+                    command.CommandText = $"DROP TABLE [{category.CategoriesName}]";
+                    command.Connection = connection;
+
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = $"DELETE FROM Categories WHERE Categories.Id = {category.Id}";
+                    command.ExecuteNonQuery();
+
+                    if (isShowSuccessful)
                         MessageBox.Show($"Категория {category.CategoriesName} удалена", "Выполнено");
                     return true;
                 }
@@ -104,11 +113,10 @@ namespace Manager.Model
                     connection.Open();
 
                     SqlCommand command = new SqlCommand();
+                                                                                
+                    command.CommandText = $"DELETE FROM [{word.CategoryName}] WHERE [{word.CategoryName}].Id = {word.Id}";
+                    command.Connection = connection;
 
-                    command.CommandText = $"DROP TABLE {word.CategoryName}";
-                    command.ExecuteNonQuery();
-                                        
-                    command.CommandText = $"DELETE FROM {word.CategoryName} WHERE {word.CategoryName}.Id = {word.Id}";
                     command.ExecuteNonQuery();                    
 
                     connection.Close();
@@ -129,12 +137,16 @@ namespace Manager.Model
         {
             try
             {
-                using (IDbConnection db = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sqlCommand = $"INSERT INTO Categories VALUES({category.LevelsId},'{category.CategoriesName}')";
-                    db.Query(sqlCommand);
+                    connection.Open();
 
-                    sqlCommand = $"CREATE TABLE {category.CategoriesName} (" +
+                    SqlCommand command = new SqlCommand();
+                    command.CommandText = $"INSERT INTO Categories VALUES({category.LevelsId},'{category.CategoriesName}')";
+                    command.Connection = connection;
+                    command.ExecuteNonQuery();
+
+                    command.CommandText = $"CREATE TABLE [{category.CategoriesName}] (" +
                         $"Id INT IDENTITY PRIMARY KEY," +
                         $" CategoryName NVARCHAR(50) REFERENCES Categories(CategoriesName) ON DELETE CASCADE," +
                         $" Words NVARCHAR(20) NOT NULL," +
@@ -144,9 +156,9 @@ namespace Manager.Model
                         $" TransSentence NVARCHAR(120) NOT NULL," +
                         $" Picture VARBINARY(MAX) NOT NULL)";
 
-                    db.Query(sqlCommand);
+                    command.ExecuteNonQuery();
 
-                    if(isShowSuccessful)
+                    if (isShowSuccessful)
                         MessageBox.Show($"Категория {category.CategoriesName} создана", "Выполнено");
                 }
             }
@@ -164,9 +176,9 @@ namespace Manager.Model
                 {                    
                     CreateCategory(newCategory, false);
 
-                    string sqlCommand = $"INSERT INTO {newCategory.CategoriesName} " +
-                        $"SELECT '{newCategory.CategoriesName}', Words, Transcriptions, Sentence, TranslateWords, TransSentence" +
-                        $" from {oldCategory.CategoriesName}";
+                    string sqlCommand = $"INSERT INTO [{newCategory.CategoriesName}] " +
+                        $"SELECT '{newCategory.CategoriesName}', Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture" +
+                        $" FROM [{oldCategory.CategoriesName}]";
                     db.Query<Category>(sqlCommand);
 
                     if(!RemoveCategory(oldCategory, false))
@@ -192,7 +204,7 @@ namespace Manager.Model
                     connection.Open();
 
                     SqlCommand command = connection.CreateCommand();
-                    command.CommandText = $"INSERT INTO {word.CategoryName} (CategoryName, Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture) " +
+                    command.CommandText = $"INSERT INTO [{word.CategoryName}] (CategoryName, Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture) " +
                         $"VALUES (" +
                         $"'{word.CategoryName}', " +
                         $"'{word.Words}', " +
@@ -204,6 +216,7 @@ namespace Manager.Model
 
                     command.Parameters.Add("@Picture", SqlDbType.VarBinary, 1000000);
                     command.Parameters["@Picture"].Value = word.Picture;
+                    command.Connection = connection;
 
                     command.ExecuteNonQuery();
 
@@ -223,17 +236,41 @@ namespace Manager.Model
         {
             try
             {
-                using (IDbConnection db = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sqlCommand = $"UPDATE {oldWord.CategoryName} SET " +
+                    connection.Open();
+
+                    SqlCommand command = new SqlCommand();
+
+                    if(newWord.Picture is not null)
+                    {
+                        command.Parameters.Add("@Picture", SqlDbType.VarBinary, 1000000);
+                        command.Parameters["@Picture"].Value = newWord.Picture;
+                        command.CommandText = $"UPDATE [{oldWord.CategoryName}] SET " +
                         $"CategoryName = '{oldWord.CategoryName}', " +
                         $"Words = '{newWord.Words}', " +
                         $"Transcriptions = N'{newWord.Transcriptions}', " +
                         $"Sentence = '{newWord.Sentence}', " +
                         $"TranslateWords = '{newWord.TranslateWords}', " +
-                        $"TransSentence = '{newWord.TransSentence}'";
+                        $"TransSentence = '{newWord.TransSentence}', " +
+                        $"Picture = @Picture " +
+                        $"WHERE Id = {newWord.Id}";
+                    }
+                    else
+                    {                        
+                        command.CommandText = $"UPDATE [{oldWord.CategoryName}] SET " +
+                        $"CategoryName = '{oldWord.CategoryName}', " +
+                        $"Words = '{newWord.Words}', " +
+                        $"Transcriptions = N'{newWord.Transcriptions}', " +
+                        $"Sentence = '{newWord.Sentence}', " +
+                        $"TranslateWords = '{newWord.TranslateWords}', " +
+                        $"TransSentence = '{newWord.TransSentence}' " +
+                        $"WHERE Id = {newWord.Id}";
+                    }
 
-                    db.Query<Word>(sqlCommand);
+                    command.Connection = connection;
+
+                    command.ExecuteNonQuery();
 
                     if (isShowSuccessful)
                         MessageBox.Show($"Слово {oldWord.Words} изменено", "Выполнено");
@@ -263,6 +300,26 @@ namespace Manager.Model
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка при приобразовании изображения");
+                return null;
+            }
+        }
+
+        public static byte[] ImageSourceToByteArray(ImageSource imageSource)
+        {
+            try
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(imageSource as BitmapSource));
+
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    encoder.Save(stream);
+                    return stream.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка при преобразовании изображения в массив байт");
                 return null;
             }
         }

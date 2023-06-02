@@ -41,17 +41,14 @@ namespace Manager
          
 
             levels = Data.GetLevels();
-            categories = Data.GetCategories();  
+            langLevel.ItemsSource = levels;
+
+            UpdateViewsInfoFromDB(); 
 
             if(categories != null )
                 foreach (var category in categories)
                     wordTables.Add(category.CategoriesName, Data.GetWords(category.CategoriesName));
-
-            categoryGrid.ItemsSource = categories.ToList();
-            wordCategory.ItemsSource = categories.ToList();
-            langLevel.ItemsSource = levels;
-            categoryNameOfWord.ItemsSource = categories.ToList();
-
+                        
         }
 
         private void addCategory_Click(object sender, RoutedEventArgs e)
@@ -62,11 +59,9 @@ namespace Manager
                 if(categoryNameField.Text?.Length > 0)
                 {
                     Data.CreateCategory(new Category { Id = 0, LevelsId = level.Id, CategoriesName = categoryNameField.Text }, isShowSuccessfulOperations);
-                    List<Category> tempCtegory = Data.GetCategories();
-                    categoryGrid.ItemsSource = tempCtegory.ToList();
-                    wordCategory.ItemsSource = tempCtegory.ToList();
-                    categoryNameOfWord.ItemsSource = tempCtegory.ToList();
-                    categories = tempCtegory.ToList();
+
+                    UpdateViewsInfoFromDB();
+                    wordTables.Add(categoryNameField.Text, new List<Word>());
                 }
                 else
                 {
@@ -95,40 +90,48 @@ namespace Manager
                             {
                                 if (transSentenceField.Text?.Length > 0)
                                 {
-                                    string transcription = "";
-                                    transcription = transcriptionsField.Text;
-                                    if(!(ImgLoc?.Length > 0))
+                                    //if(!(ImgLoc?.Length > 0))
+                                    //{
+                                    //    ImgLoc = "\\image\\default_picture.png";
+                                    //}
+                                                                       
+                                    
+                                    if(imageWord.Source is not null)
                                     {
-                                        ImgLoc = "\\image\\default_picture.png";
+                                        byte[] image = null;
+                                        FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
+                                        BinaryReader binaryReader = new BinaryReader(file);
+                                        image = binaryReader.ReadBytes((int)file.Length);
+
+                                        Word word = new Word
+                                        {
+                                            Id = 0,
+                                            CategoryName = categoryNameOfWord.Text,
+                                            Words = wordsField.Text,
+                                            Transcriptions = transcriptionsField.Text.Replace("\'", "\'\'"),
+                                            Sentence = sentenceField.Text,
+                                            TranslateWords = translateWordsField.Text,
+                                            TransSentence = transSentenceField.Text,
+                                            Picture = image
+                                        };
+
+                                        Data.AddWord(word, isShowSuccessfulOperations);
+
+                                        if (wordTables[word.CategoryName] != null)
+                                        {
+                                            wordTables[word.CategoryName] = Data.GetWords(word.CategoryName);
+
+                                            wordCategory.SelectedItem = categories.FirstOrDefault(c => c.CategoriesName == word.CategoryName);
+
+                                            if (wordTables.Keys.Contains(word.CategoryName))
+                                                wordGrid.ItemsSource = wordTables[word.CategoryName];
+                                        }
                                     }
-
-                                    byte[] image = null;
-                                    FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
-                                    BinaryReader binaryReader = new BinaryReader(file);
-                                    image = binaryReader.ReadBytes((int)file.Length);
-
-                                    Word word = new Word
+                                    else
                                     {
-                                        Id = 0,
-                                        CategoryName = categoryNameOfWord.Text,
-                                        Words = wordsField.Text,
-                                        Transcriptions = transcription,
-                                        Sentence = sentenceField.Text,
-                                        TranslateWords = translateWordsField.Text,
-                                        TransSentence = transSentenceField.Text,
-                                        Picture = image
-                                    };
-
-                                    Data.AddWord(word, isShowSuccessfulOperations);
-
-                                    if (wordTables[word.CategoryName] != null)
-                                    {
-                                        wordTables.Add(word.CategoryName, Data.GetWords(word.CategoryName));
-
-                                        wordCategory.SelectedItem = categories.FirstOrDefault(c => c.CategoriesName == word.CategoryName);
-                                        wordGrid.ItemsSource = wordTables[word.CategoryName];
+                                        MessageBox.Show("Добавте картинку", "Пустое поле Picture",
+                                        MessageBoxButton.OK, MessageBoxImage.Error);
                                     }
-                                                                                
                                 }
                                 else
                                 {
@@ -173,26 +176,25 @@ namespace Manager
             {
                 Category category = (Category)categoryGrid.SelectedItem;
                 Level selectedLevelId = (Level)langLevel.SelectedItem;
-                category.LevelsId = selectedLevelId.Id;
-                category.CategoriesName = categoryNameField.Text;
+
+                Category newCategory = new Category { Id = 0, LevelsId = selectedLevelId.Id, CategoriesName = categoryNameField.Text };
 
                 foreach (var item in categories)
                 {
                     if(category.Id == item.Id)
                     {
-                        if(category.LevelsId == item.LevelsId && category.CategoriesName == item.CategoriesName)
+                        if(newCategory.LevelsId == item.LevelsId && newCategory.CategoriesName == item.CategoriesName)
                         {
                             MessageBox.Show("Не требуется изменение категории, так как данные категории в таблице не изменились");
                         }
                         else
                         {
-                            Data.UpdateCategory(category, item, isShowSuccessfulOperations);
+                            Data.UpdateCategory(newCategory, item, isShowSuccessfulOperations);
 
-                            List<Category> tempCtegory = Data.GetCategories();
-                            categoryGrid.ItemsSource = tempCtegory.ToList();
-                            wordCategory.ItemsSource = tempCtegory.ToList();
-                            categoryNameOfWord.ItemsSource = tempCtegory.ToList();
-                            categories = tempCtegory.ToList();
+                            UpdateViewsInfoFromDB();
+                            wordTables.Remove(item.CategoriesName);
+                            wordTables.Add(newCategory.CategoriesName, Data.GetWords(newCategory.CategoriesName));
+
                             break;
                         }
                     }
@@ -209,13 +211,16 @@ namespace Manager
         {
             if(categoryGrid.SelectedItem != null)
             {
-                Data.RemoveCategory((Category)categoryGrid.SelectedItem, isShowSuccessfulOperations);
+                var category = (Category)categoryGrid.SelectedItem;
 
-                List<Category> tempCtegory = Data.GetCategories();
-                categoryGrid.ItemsSource = tempCtegory.ToList();
-                wordCategory.ItemsSource = tempCtegory.ToList();
-                categoryNameOfWord.ItemsSource = tempCtegory.ToList();
-                categories = tempCtegory.ToList();
+                if (MessageBox.Show("При удалении категории все слова этой категории будут удалены.\n\n\t\tВы уверены?", "Внимание!",
+                    MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK)
+                {                    
+                    Data.RemoveCategory(category, isShowSuccessfulOperations);
+                }               
+
+                UpdateViewsInfoFromDB();
+                wordTables.Remove(category.CategoriesName);
             }
             else
             {
@@ -226,23 +231,26 @@ namespace Manager
 
         private void updateWord_Click(object sender, RoutedEventArgs e)
         {
-            if(wordGrid.SelectedItem != null)
+            if(wordGrid.SelectedItem is not null)
             {
                 Word updateWord = (Word)wordGrid.SelectedItem;
 
                 updateWord.CategoryName = categoryNameOfWord.SelectedItem.ToString();
                 updateWord.Words = wordsField.Text;
                 updateWord.TranslateWords = translateWordsField.Text;
-                updateWord.Transcriptions = transcriptionsField.Text;
+                updateWord.Transcriptions = transcriptionsField.Text.Replace("\'", "\'\'");
                 updateWord.Sentence = sentenceField.Text;
                 updateWord.TransSentence = transSentenceField.Text;
 
-                if (imageWord.Source.ToString().Contains(".svg"))
+                byte[] byteArray = null;
+
+                if (imageWord.Source is not null)
                 {
                     FileStream file = new FileStream(ImgLoc, FileMode.Open, FileAccess.Read);
                     BinaryReader binaryReader = new BinaryReader(file);
-                    updateWord.Picture = binaryReader.ReadBytes((int)file.Length);
+                    byteArray = binaryReader.ReadBytes((int)file.Length);
                 }
+                updateWord.Picture = byteArray;
 
                 Data.UpdateWord(updateWord, (Word)wordGrid.SelectedItem, isShowSuccessfulOperations);
 
@@ -373,7 +381,7 @@ namespace Manager
                 transcriptionsField.Text = selectedWord.Transcriptions;
                 sentenceField.Text = selectedWord.Sentence;
                 transSentenceField.Text = selectedWord.TransSentence;
-                imageWord.Source = Data.ByteArrToImageSource(selectedWord.Picture);                           
+                imageWord.Source = null;                           
             }
         }               
 
@@ -388,10 +396,23 @@ namespace Manager
             {
                 var selectedCategory = (Category)categoryGrid.SelectedItem;
 
-                langLevel.SelectedItem = levels.FirstOrDefault(c => c.Id == selectedCategory.Id);
+                langLevel.SelectedItem = levels.FirstOrDefault(l => l.Id == selectedCategory.LevelsId);
                 categoryNameField.Text = selectedCategory.CategoriesName;
             }
         }
 
+        private void UpdateViewsInfoFromDB()
+        {
+            List<Category> tempCtegory = Data.GetCategories();
+            categoryGrid.ItemsSource = tempCtegory.ToList();
+            wordCategory.ItemsSource = tempCtegory.ToList();
+            categoryNameOfWord.ItemsSource = tempCtegory.ToList();
+            categories = tempCtegory.ToList();
+        }
+
+        private void langLevel_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }
