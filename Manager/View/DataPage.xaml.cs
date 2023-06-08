@@ -107,12 +107,13 @@ namespace Manager
                                         {
                                             Id = 0,
                                             CategoryName = categoryNameOfWord.Text,
-                                            Words = wordsField.Text,
+                                            Words = wordsField.Text.Replace("\'", "\'\'"),
                                             Transcriptions = transcriptionsField.Text.Replace("\'", "\'\'"),
-                                            Sentence = sentenceField.Text,
-                                            TranslateWords = translateWordsField.Text,
-                                            TransSentence = transSentenceField.Text,
-                                            Picture = image
+                                            Sentence = sentenceField.Text.Replace("\'", "\'\'"),
+                                            TranslateWords = translateWordsField.Text.Replace("\'", "\'\'"),
+                                            TransSentence = transSentenceField.Text.Replace("\'", "\'\'"),
+                                            Picture = image,
+                                            Is_completed = 0
                                         };
 
                                         Data.AddWord(word, isShowSuccessfulOperations);
@@ -236,11 +237,11 @@ namespace Manager
                 Word updateWord = (Word)wordGrid.SelectedItem;
 
                 updateWord.CategoryName = categoryNameOfWord.SelectedItem.ToString();
-                updateWord.Words = wordsField.Text;
-                updateWord.TranslateWords = translateWordsField.Text;
+                updateWord.Words = wordsField.Text.Replace("\'", "\'\'");
+                updateWord.TranslateWords = translateWordsField.Text.Replace("\'", "\'\'");
                 updateWord.Transcriptions = transcriptionsField.Text.Replace("\'", "\'\'");
-                updateWord.Sentence = sentenceField.Text;
-                updateWord.TransSentence = transSentenceField.Text;
+                updateWord.Sentence = sentenceField.Text.Replace("\'", "\'\'");
+                updateWord.TransSentence = transSentenceField.Text.Replace("\'", "\'\'");
 
                 byte[] byteArray = null;
 

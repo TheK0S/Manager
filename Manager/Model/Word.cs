@@ -16,5 +16,6 @@ namespace Manager.Model
         public string? TranslateWords { get; set; }
         public string? TransSentence { get; set; }
         public byte[] Picture { get; set; }
+        public int Is_completed { get; set; }
     }
 }

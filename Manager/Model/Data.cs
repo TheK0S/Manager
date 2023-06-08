@@ -154,7 +154,8 @@ namespace Manager.Model
                         $" Sentence NVARCHAR(120) NOT NULL," +
                         $" TranslateWords NVARCHAR(20) NOT NULL," +
                         $" TransSentence NVARCHAR(120) NOT NULL," +
-                        $" Picture VARBINARY(MAX) NOT NULL)";
+                        $" Picture VARBINARY(MAX) NOT NULL," +
+                        $" Is_completed INT NOT NULL DEFAULT 0)";
 
                     command.ExecuteNonQuery();
 
@@ -177,7 +178,7 @@ namespace Manager.Model
                     CreateCategory(newCategory, false);
 
                     string sqlCommand = $"INSERT INTO [{newCategory.CategoriesName}] " +
-                        $"SELECT '{newCategory.CategoriesName}', Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture" +
+                        $"SELECT '{newCategory.CategoriesName}', Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture, Is_completed" +
                         $" FROM [{oldCategory.CategoriesName}]";
                     db.Query<Category>(sqlCommand);
 
@@ -204,7 +205,7 @@ namespace Manager.Model
                     connection.Open();
 
                     SqlCommand command = connection.CreateCommand();
-                    command.CommandText = $"INSERT INTO [{word.CategoryName}] (CategoryName, Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture) " +
+                    command.CommandText = $"INSERT INTO [{word.CategoryName}] (CategoryName, Words, Transcriptions, Sentence, TranslateWords, TransSentence, Picture, Is_completed) " +
                         $"VALUES (" +
                         $"'{word.CategoryName}', " +
                         $"'{word.Words}', " +
@@ -212,7 +213,8 @@ namespace Manager.Model
                         $"'{word.Sentence}', " +
                         $"'{word.TranslateWords}', " +
                         $"'{word.TransSentence}', " +
-                        $"@Picture)";
+                        $"@Picture," +
+                        $"{word.Is_completed})";
 
                     command.Parameters.Add("@Picture", SqlDbType.VarBinary, 1000000);
                     command.Parameters["@Picture"].Value = word.Picture;
@@ -253,7 +255,8 @@ namespace Manager.Model
                         $"Sentence = '{newWord.Sentence}', " +
                         $"TranslateWords = '{newWord.TranslateWords}', " +
                         $"TransSentence = '{newWord.TransSentence}', " +
-                        $"Picture = @Picture " +
+                        $"Picture = @Picture, " +
+                        $"Is_completed = {newWord.Is_completed}" +
                         $"WHERE Id = {newWord.Id}";
                     }
                     else
@@ -264,7 +267,8 @@ namespace Manager.Model
                         $"Transcriptions = N'{newWord.Transcriptions}', " +
                         $"Sentence = '{newWord.Sentence}', " +
                         $"TranslateWords = '{newWord.TranslateWords}', " +
-                        $"TransSentence = '{newWord.TransSentence}' " +
+                        $"TransSentence = '{newWord.TransSentence}', " +
+                        $"Is_completed = {newWord.Is_completed}" +
                         $"WHERE Id = {newWord.Id}";
                     }
 

@@ -86,7 +86,7 @@
                 <DataGridTextColumn Header="Предложение" Binding="{Binding Sentence}"/>
                 <DataGridTextColumn Header="Перевод слова" Binding="{Binding TranslateWords}"/>
                 <DataGridTextColumn Header="Перевод предложения" Binding="{Binding TransSentence}"/>
-                <!--<DataGridTextColumn Header="Картинка" Binding="{Binding Picture}"/>-->
+                <DataGridTextColumn Header="Is completed" Binding="{Binding Is_completed}"/>
                 <DataGridTemplateColumn Header="Картинка">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
