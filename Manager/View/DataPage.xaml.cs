@@ -281,8 +281,11 @@ namespace Manager
                 Word word = (Word)wordGrid.SelectedItem;
                 Data.RemoveWord(word, isShowSuccessfulOperations);
 
-                if (word.CategoryName != null)
+                if (wordTables.Keys.Contains(word.CategoryName))
+                {
                     wordTables[word.CategoryName] = Data.GetWords(word.CategoryName);
+                    wordGrid.ItemsSource = wordTables[word.CategoryName];
+                }               
             }
             else
             {
